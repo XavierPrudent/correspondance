@@ -2,17 +2,17 @@
 ## User input data
 set.user.data <- function(){
   
-  chipCards.oct <<- "/home/xprudent/civilia/STO/data/cartes_a_puces/octranspo/sto_20171026100652.csv.RDS"
-  chipCards.sto <<- "/home/xprudent/civilia/STO/data/cartes_a_puces/sto/Deplacement2017JanFev.CSV.RDS"
+  chipCards.oct <<- "in/cartes_a_puces/octranspo/sto_20171026100652.csv.RDS"
+  chipCards.sto <<- "in/cartes_a_puces/sto/destination_estimee/Deplacement2017JanFev.CSV.RDS"
   
   routes.sto <<- c( 11, 17, 22, 23, 24, 25, 26, 27, 29, 31, 
                     32, 33, 34, 35, 36, 37, 38, 40, 41, 44, 
                     45, 46, 47, 55, 59, 67, 87, 85, 82, 94, 
-                    98, 93, 95, 300, 400, 300, 200, 20 )
+                    98, 93, 95, 300, 400, 200, 20 )
   
   my.week  <<- c("Tuesday","Wednesday","Thursday")
   my.week.tag <<- "Semaine"
-output.dir <<- "/home/xprudent/civilia/STO/correspondance-oct-sto/out/"
+  output.dir <<- "/home/xprudent/civilia/STO/correspondance-oct-sto/out/"
   first.day <<- as.Date("2017-01-09")
   last.day <<- as.Date("2017-01-27")
   
@@ -20,8 +20,8 @@ output.dir <<- "/home/xprudent/civilia/STO/correspondance-oct-sto/out/"
   oct.lon.bot <- -75.722194
   oct.lat.top <- 45.442935
   oct.lon.top <- -75.665374
-  gtfs.oct <<- "/Users/lavieestuntoucan/civ-sto/data/GTFS/octranspo/"
-  gtfs.sto <<- "/Users/lavieestuntoucan/civ-sto/data/GTFS/sto/jan2017-july2017/"
+  gtfs.oct <<- "in/GTFS/octranspo/"
+  gtfs.sto <<- "in/GTFS/sto/jan2017-july2017/"
 }
 #####################################################
 read.cards <- function(){
@@ -130,7 +130,10 @@ loop.cards.oct2sto <- function(d){
 #####################################################
 ## Search for the transferts STO -> OCT
 search.corr.sto2oct <- function(d){
-  d.oct <- cards.oct[date == d$DateDeplacement & FarecardID == d$NumCarteSerie & Time > d$HeureTransaction & Time - d$HeureTransaction < 1.5]
+  d.oct <- cards.oct[date == d$DateDeplacement & 
+                       FarecardID == d$NumCarteSerie & 
+                       Time > d$HeureTransaction & 
+                       Time - d$HeureTransaction < 1.5]
   if( nrow(d.oct) > 1 ){
     d.oct <- d.oct %>% arrange(Time) %>% head(1)
   }
@@ -152,15 +155,15 @@ search.corr.sto2oct <- function(d){
 #####################################################
 ## Search for the transferts OCT -> STO
 search.corr.oct2sto <- function(d){
-
+  
   d.sto <- cards.sto[DateDeplacement == d$date & NumCarteSerie == d$FarecardID & HeureTransaction > d$Time & HeureTransaction - d$Time < 1.5]
   if( nrow(d.sto) > 1 ){
     d.sto <- d.sto %>% arrange(HeureTransaction) %>% head(1)
   }
   d.out <- data.frame(NumCarte=NA,titre=NA,date=NA,HeureA=NA,LigneA=NA,StopA=NA,HeureB=NA,StopB=NA,TripB=NA)
   if( nrow(d.sto) == 0 ){
-  return(d.out)
-}
+    return(d.out)
+  }
   else {
     d.out$NumCarte <- as.character(d.sto$NumCarteSerie)
     d.out$titre <- as.character(d$TrxTypeName)

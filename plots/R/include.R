@@ -97,4 +97,3 @@ create.matrix <- function(x){
   }
   write.table(mat,"~/Desktop/temp.csv",quote = F,row.names = F,col.names = F,sep=",")
 }
-
